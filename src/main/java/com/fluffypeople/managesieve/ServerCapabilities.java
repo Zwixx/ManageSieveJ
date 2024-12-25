@@ -46,9 +46,9 @@ public class ServerCapabilities {
     private String version = null;
 
     public ServerCapabilities() {
-        SASLMethods = new LinkedHashSet<String>();
-        sieveExtensions = new HashSet<String>();
-        notify = new HashSet<String>();
+        SASLMethods = new LinkedHashSet<>();
+        sieveExtensions = new HashSet<>();
+        notify = new HashSet<>();
     }
 
     public void setImplementationName(final String name) {
@@ -127,7 +127,7 @@ public class ServerCapabilities {
         return version;
     }
 
-    public boolean hasNoitfy(final String method) {
+    public boolean hasNotify(final String method) {
         return notify.contains(method.toLowerCase());
     }
 

@@ -23,6 +23,8 @@
  */
 package com.fluffypeople.managesieve;
 
+import java.util.Objects;
+
 /**
  * Model a sieve script, that has either been created locally, or
  * resides on a remote server.
@@ -84,7 +86,7 @@ public class SieveScript {
             return false;
         }
         final SieveScript other = (SieveScript) obj;
-        return (this.name == null) ? (other.name == null) : this.name.equals(other.name);
+        return Objects.equals(this.name, other.name);
     }
 
 }
