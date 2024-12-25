@@ -1,0 +1,5 @@
+module ManageSieveJ {
+    exports com.fluffypeople.managesieve;
+    exports com.fluffypeople.managesieve.xml;
+
+}

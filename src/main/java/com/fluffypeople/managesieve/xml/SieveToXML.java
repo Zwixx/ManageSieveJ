@@ -28,8 +28,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Convert a Sieve script to its XML representation.
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SieveToXML {
 
-    private static final Logger log = LoggerFactory.getLogger(SieveToXML.class);
+    private static final Logger log = Logger.getLogger(SieveToXML.class.getName());
     private StreamTokenizer in;
     private static final String[] CONTROL_NAMES = {"if", "elsif", "else", "stop", "require"};
 
@@ -59,14 +59,14 @@ public class SieveToXML {
     }
 
     private void commands(final XML xml) throws ParseException, IOException {
-        log.debug("commands start");
+        log.log(Level.FINEST, "commands start");
         while (command(xml)) {
         }
-        log.debug("commands end");
+        log.log(Level.FINEST, "commands end");
     }
 
     private boolean command(final XML xml) throws IOException, ParseException {
-        log.debug("command");
+        log.log(Level.FINEST, "command");
         int token = in.nextToken();
         // First token should be an identifer
         if (token == StreamTokenizer.TT_WORD) {
@@ -98,7 +98,7 @@ public class SieveToXML {
     }
 
     private void arguments(XML xml) throws ParseException, IOException {
-        log.debug("arguments");
+        log.log(Level.FINEST, "arguments");
         while (argument(xml)) {
         }
         int token = in.nextToken();
@@ -111,7 +111,7 @@ public class SieveToXML {
     }
 
     private boolean argument(XML xml) throws IOException, ParseException {
-        log.debug("argument");
+        log.log(Level.FINEST, "argument");
         int token = in.nextToken();
         in.pushBack();
         if (token == '[') {
@@ -136,7 +136,7 @@ public class SieveToXML {
     }
 
     private void string(XML xml) throws ParseException, IOException {
-        log.debug("string");
+        log.log(Level.FINEST, "string");
         int token = in.nextToken();
         if (token == '"') {
             xml.add("str", in.sval);
@@ -179,7 +179,7 @@ public class SieveToXML {
                                 try {
                                     line.append(Character.toChars(token));
                                 } catch (java.lang.IllegalArgumentException ex) {
-                                    log.error("{} is not a valid char ",token);
+                                    log.log(Level.SEVERE, String.format("%s is not a valid char ", token), ex);
                                     throw ex;
                                 }
                             }
@@ -210,7 +210,7 @@ public class SieveToXML {
     }
 
     private void string_list(XML xml) throws ParseException, IOException {
-        log.debug("string_list");
+        log.log(Level.FINEST, "string_list");
         int token = in.nextToken();
         if (token == '[') {
             xml.start("list");
@@ -228,7 +228,7 @@ public class SieveToXML {
     }
 
     private void tag(XML xml) throws ParseException, IOException {
-        log.debug("tag");
+        log.log(Level.FINEST, "tag");
         int token = in.nextToken();
         if (token == ':') {
             token = in.nextToken();
@@ -243,7 +243,7 @@ public class SieveToXML {
     }
 
     private void number(XML xml) throws ParseException, IOException {
-        log.debug("number");
+        log.log(Level.FINEST, "number");
         int token = in.nextToken();
         if (token == StreamTokenizer.TT_NUMBER) {
             Long raw = (long) in.nval;
@@ -269,7 +269,7 @@ public class SieveToXML {
     }
 
     private void block(XML xml) throws IOException, ParseException {
-        log.debug("block");
+        log.log(Level.FINEST, "block");
         int token = in.nextToken();
         if (token == '{') {
             commands(xml);
@@ -280,11 +280,11 @@ public class SieveToXML {
         } else {
             raiseError("{", token, in.lineno());
         }
-        log.debug("block end");
+        log.log(Level.FINEST, "block end");
     }
 
     private void test_list(XML xml) throws IOException, ParseException {
-        log.debug("test_list");
+        log.log(Level.FINEST, "test_list");
         int token = in.nextToken();
         if (token == '(') {
             do {
@@ -300,7 +300,7 @@ public class SieveToXML {
     }
 
     private void test(XML xml) throws ParseException, IOException {
-        log.debug("test");
+        log.log(Level.FINEST, "test");
         int token = in.nextToken();
         if (token == StreamTokenizer.TT_WORD) {
             xml.start("test", "name", in.sval);

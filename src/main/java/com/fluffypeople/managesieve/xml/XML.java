@@ -28,6 +28,8 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -36,8 +38,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.*;
 
 /**
@@ -47,7 +47,7 @@ import org.w3c.dom.*;
  */
 public class XML {
 
-    private static final Logger log = LoggerFactory.getLogger(XML.class);
+    private static final Logger log = Logger.getLogger(XML.class.getName());
     private Node current;
     private Document root;
     private List<String> cdatas;
@@ -85,8 +85,7 @@ public class XML {
 
             return doc;
         } catch (ParserConfigurationException ex) {
-            log.error("Can't create new Document: {}", ex.getMessage(), ex);
-
+            log.log(Level.SEVERE, String.format("Can't create new Document: %s", ex.getMessage()), ex);
             return null;
         }
     }
@@ -127,7 +126,7 @@ public class XML {
      * Start an XML element, including attributes if any
      *
      * @param tag String name of the element
-     * @param attrib Map<String, String> holding key, value attribute pairs.
+     * @param attrib Map&lt;String, String&gt; holding key, value attribute pairs.
      * Ignored if null.
      * @return this XML document
      */
@@ -141,7 +140,7 @@ public class XML {
                 try {
                     a = root.createAttribute(key);
                 } catch (DOMException ex) {
-                    log.error("Error trying to create attribue named {}", key);
+                    log.log(Level.SEVERE, "Error trying to create attribute named {}", key);
                     throw ex;
                 }
 
@@ -236,7 +235,7 @@ public class XML {
      *
      * @param tag String giving the name of the element
      * @param text String contents of the element.
-     * @param attrib Map<String, String> holding key, value attribute pairs.
+     * @param attrib Map&lt;String, String&gt; holding key, value attribute pairs.
      * Ignored if null.
      * @return this XML document
      */
@@ -266,7 +265,7 @@ public class XML {
     /**
      * Add an empty element to the tree
      *
-     * @param tag String givng the name of the element
+     * @param tag String giving the name of the element
      * @return this XML document
      */
     public XML add(String tag) {
@@ -384,17 +383,17 @@ public class XML {
     }
 
     /**
-     * Add to list of elements that should be emmitted as CDATA sections
+     * Add to list of elements that should be emitted as CDATA sections
      */
     public void addCdata(String elementName) {
         cdatas.add(elementName);
     }
 
     /**
-     * Transform the XML to a string reprensentation, making sure that the
+     * Transform the XML to a string representation, making sure that the
      * output is well formed
      *
-     * @return a string reprenentation of the XML document
+     * @return a string representation of the XML document
      */
     @Override
     public String toString() {
@@ -429,7 +428,7 @@ public class XML {
 
             return result.getWriter().toString();
         } catch (TransformerException ex) {
-            log.error("Can't convert to string: {}", ex.getMessage(), ex);
+            log.log(Level.SEVERE, String.format("Can't convert to string: %s", ex.getMessage()), ex);
 
             return "<error>Can't produce xml</error>";
         }
