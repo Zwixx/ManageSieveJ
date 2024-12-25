@@ -28,8 +28,8 @@ package com.fluffypeople.managesieve;
  *  @author Linagora
  */
 public class ResponseAndPayload {
-    private ManageSieveResponse response;
-    private String payload;
+    private final ManageSieveResponse response;
+    private final String payload;
 
     public ResponseAndPayload(ManageSieveResponse response, String payload) {
         this.response = response;

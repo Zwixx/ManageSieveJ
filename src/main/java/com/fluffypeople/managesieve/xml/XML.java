@@ -235,7 +235,7 @@ public class XML {
             current.appendChild(t);
         }
 
-        end(tag);
+        end();
 
         return this;
     }
@@ -245,7 +245,7 @@ public class XML {
         if (text != null) {
             current.appendChild(root.createTextNode(text));
         }
-        end(tag);
+        end();
         return this;
     }
 

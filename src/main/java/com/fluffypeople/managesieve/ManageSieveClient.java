@@ -29,6 +29,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
@@ -71,16 +72,16 @@ import javax.security.sasl.SaslException;
 public class ManageSieveClient {
 
     private static final Logger log = Logger.getLogger(ManageSieveClient.class.getName());
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final Charset UTF8 = StandardCharsets.UTF_8;
     private static final char DQUOTE = '"';
     private static final char LEFT_CURRLY_BRACE = '{';
     private static final char LEFT_BRACKET = '(';
     private static final char RIGHT_BRACKET = ')';
     private static final String CRLF = "\r\n";
     private static final char SP = ' ';
-    private final static Pattern ESCAPE_RE = Pattern.compile("([\"\\\\])");
-    private final static int DQUOTE_LENGTH = 1;
-    private final static int MAX_ESCAPED_STRING_LENGTH = 1024;
+    private static final Pattern ESCAPE_RE = Pattern.compile("([\"\\\\])");
+    private static final int DQUOTE_LENGTH = 1;
+    private static final int MAX_ESCAPED_STRING_LENGTH = 1024;
     private Socket socket = null;
     private ServerCapabilities cap;
     private StreamTokenizer in;
@@ -771,15 +772,12 @@ public class ManageSieveClient {
      * @return converted String
      */
     private String encodeString(final String raw) {
-        StringBuilder result = new StringBuilder();
 
-        result.append("{");
-        result.append(Integer.toString(raw.getBytes(UTF8).length));
-        result.append("+}");
-        result.append(CRLF);
-        result.append(raw);
-
-        return result.toString();
+        return "{" +
+                raw.getBytes(UTF8).length +
+                "+}" +
+                CRLF +
+                raw;
     }
 
     private void sendCommand(final String command, String... param) throws IOException {
@@ -848,8 +846,6 @@ public class ManageSieveClient {
                     return "EOF";
                 case StreamTokenizer.TT_NUMBER:
                     return "NUMBER";
-                case StreamTokenizer.TT_EOL:
-                    return "EOL";
                 case StreamTokenizer.TT_WORD:
                     return ("WORD [" + in.sval + "]");
                 default:
