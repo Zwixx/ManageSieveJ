@@ -68,10 +68,10 @@ public class SieveToXML {
     private boolean command(final XML xml) throws IOException, ParseException {
         log.log(Level.FINEST, "command");
         int token = in.nextToken();
-        // First token should be an identifer
+        // First token should be an identifier
         if (token == StreamTokenizer.TT_WORD) {
             String name = in.sval;
-            // Stricly, identifiers shouldn't start with a number
+            // Strictly, identifiers shouldn't start with a number
             // TODO: Check that
 
             String tag = nameIsControl(name) ? "control" : "action";
@@ -359,8 +359,6 @@ public class SieveToXML {
                     return "EOF";
                 case StreamTokenizer.TT_NUMBER:
                     return "NUMBER";
-                case StreamTokenizer.TT_EOL:
-                    return "EOL";
                 case StreamTokenizer.TT_WORD:
                     return "WORD";
                 default:

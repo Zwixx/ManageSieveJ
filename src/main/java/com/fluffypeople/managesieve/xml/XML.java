@@ -38,6 +38,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
 import org.w3c.dom.*;
 
 /**
@@ -50,7 +51,7 @@ public class XML {
     private static final Logger log = Logger.getLogger(XML.class.getName());
     private Node current;
     private Document root;
-    private List<String> cdatas;
+    private final List<String> cdatas;
 
     /**
      * Creates a new instance of XML
@@ -58,7 +59,7 @@ public class XML {
     public XML() {
         root = newDocument();
         current = root;
-        cdatas = new ArrayList<String>();
+        cdatas = new ArrayList<>();
     }
 
     /**
@@ -69,7 +70,7 @@ public class XML {
     public XML(String xsltRef) {
         root = newDocument(xsltRef);
         current = root;
-        cdatas = new ArrayList<String>();
+        cdatas = new ArrayList<>();
     }
 
     /**
@@ -85,8 +86,7 @@ public class XML {
 
             return doc;
         } catch (ParserConfigurationException ex) {
-            log.log(Level.SEVERE, String.format("Can't create new Document: %s", ex.getMessage()), ex);
-            return null;
+            throw new RuntimeException("Can't create new Document", ex);
         }
     }
 
@@ -134,17 +134,16 @@ public class XML {
         Element e = root.createElement(tag);
 
         if (attrib != null) {
-            for (String key : attrib.keySet()) {
-                String value = attrib.get(key);
+            for (Map.Entry<String, String> key : attrib.entrySet()) {
                 Attr a;
                 try {
-                    a = root.createAttribute(key);
+                    a = root.createAttribute(key.getKey());
                 } catch (DOMException ex) {
                     log.log(Level.SEVERE, "Error trying to create attribute named {}", key);
                     throw ex;
                 }
 
-                a.setValue(value);
+                a.setValue(key.getValue());
                 e.setAttributeNode(a);
             }
         }
@@ -188,18 +187,6 @@ public class XML {
         return this;
     }
 
-    /**
-     * End an XML element
-     *
-     * @deprecated 
-     * @param tag String specifying the element to close. This is ignored, as
-     * the document keeps track of the current element
-     * @return this XML document
-     */
-    public XML end(String tag) {
-        return end();
-    }
-    
     /**
      * End an XML element,
      * @return this XML document.
