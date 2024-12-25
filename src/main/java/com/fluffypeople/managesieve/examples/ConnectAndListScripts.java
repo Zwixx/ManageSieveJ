@@ -34,9 +34,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -174,20 +172,10 @@ public class ConnectAndListScripts {
                     }
                 }};
 
-            // Ignore differences between given hostname and certificate hostname
-            HostnameVerifier hv = new HostnameVerifier() {
-                @Override
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-
             SSLContext sc = SSLContext.getInstance("SSL");
             sc.init(null, trustAllCerts, new SecureRandom());
             return sc.getSocketFactory();
-        } catch (NoSuchAlgorithmException ex) {
-            return null;
-        } catch (KeyManagementException ex) {
+        } catch (NoSuchAlgorithmException | KeyManagementException ex) {
             return null;
         }
     }
