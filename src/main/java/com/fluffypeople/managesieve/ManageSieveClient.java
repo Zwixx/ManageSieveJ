@@ -32,8 +32,11 @@ import java.nio.charset.Charset;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,10 +50,6 @@ import javax.security.auth.x500.X500Principal;
 import javax.security.sasl.Sasl;
 import javax.security.sasl.SaslClient;
 import javax.security.sasl.SaslException;
-
-import org.apache.commons.codec.binary.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A client for the Manage Sieve protocol. Manage sieve (<a
@@ -71,7 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ManageSieveClient {
 
-    private static final Logger log = LoggerFactory.getLogger(ManageSieveClient.class);
+    private static final Logger log = Logger.getLogger(ManageSieveClient.class.getName());
     private static final Charset UTF8 = Charset.forName("UTF-8");
     private static final char DQUOTE = '"';
     private static final char LEFT_CURRLY_BRACE = '{';
@@ -105,8 +104,7 @@ public class ManageSieveClient {
 
     /**
      * Returns setting for SO_TIMEOUT. 0 returns implies that the option is
-     * disabled (i.e., timeout of infinity).</p>
-     * <p>
+     * disabled (i.e., timeout of infinity).<p>
      * If the socket isn't connected, return the cached value that will be set
      * once the socket does connect.</p>
      *
@@ -121,7 +119,7 @@ public class ManageSieveClient {
 
     /**
      * Set SO_TIMEOUT. Updates a connected socket (and is stored for use when a
-     * socket connects).</p>
+     * socket connects).
      * <p>
      * From <code>Socket.setSoTimeout</code>: "Enable/disable SO_TIMEOUT with
      * the specified timeout, in milliseconds. With this option set to a
@@ -228,12 +226,12 @@ public class ManageSieveClient {
                 try {
                     subjectAlternativeNames = x509Certificate.getSubjectAlternativeNames();
                 } catch (CertificateParsingException e) {
-                    log.warn("Could not check certificate's subjectAlternativeNames", e);
+                    log.log(Level.WARNING, "Could not check certificate's subjectAlternativeNames", e);
                 }
 
                 if (subjectAlternativeNames != null) {
                     for (List<?> subjectAlternativeName : subjectAlternativeNames) {
-                        log.debug("Checking subjectAlternativeName '{}' against hostname", subjectAlternativeName);
+                        log.log(Level.FINEST, "Checking subjectAlternativeName '{}' against hostname", subjectAlternativeName);
                         // TODO support wildcard hostnames
                         if (hostname.equals(subjectAlternativeName.get(1))) {
                             return true;
@@ -244,13 +242,13 @@ public class ManageSieveClient {
                 // Check matching CN value in subject
                 X500Principal subjectPrincipal = x509Certificate.getSubjectX500Principal();
                 String certificateCN = getHostnameFromCert(subjectPrincipal);
-                log.debug("Checking certificate CN '{}' against hostname", certificateCN);
+                log.log(Level.FINEST, "Checking certificate CN '{}' against hostname", certificateCN);
                 // TODO support wildcard hostnames
                 if (hostname.equals(certificateCN)) {
                     return true;
                 }
             } else {
-                log.warn("Unexpected certificate: {}", certificate.getType());
+                log.log(Level.WARNING, "Unexpected certificate: {}", certificate.getType());
             }
         }
 
@@ -296,7 +294,7 @@ public class ManageSieveClient {
         String mechanism = escapeString(sc.getMechanismName());
         if (sc.hasInitialResponse()) {
             byte[] ir = sc.evaluateChallenge(new byte[0]);
-            String ready = new String(Base64.encodeBase64(ir));
+            String ready = new String(Base64.getEncoder().encode(ir));
             ready = encodeString(ready.trim());
             sendCommand("AUTHENTICATE", mechanism, ready);
         } else {
@@ -372,11 +370,11 @@ public class ManageSieveClient {
 
     /**
      * "This command lists the scripts the user has on the server". The results
-     * are stored into the @code{List<SieveScript>} passed in. Any existing
+     * are stored into the @code{List&lt;SieveScript&gt;} passed in. Any existing
      * contents of this list will be lost. Up to one of the scripts listed will
      * be marked active.
      *
-     * @param scripts @code{List<SieveScript>} non-null List of scripts. Will be
+     * @param scripts List&lt;SieveScript&gt; non-null List of scripts. Will be
      *                cleared if not zero length, even if there is a problem
      * @return ManageSieveResponse OK - list was fetched, NO - there was a
      * problem.
@@ -712,7 +710,7 @@ public class ManageSieveClient {
                 }
                 // Drop out of the tokenizer to read the raw bytes...
 
-                log.debug("Raw string: reading {} bytes", length);
+                log.log(Level.FINEST, "Raw string: reading {} bytes", length);
                 in.resetSyntax();
                 int count = 0;
                 byte[] buff = new byte[1024];
@@ -797,7 +795,7 @@ public class ManageSieveClient {
     }
 
     private void sendLine(final String line) throws IOException {
-        log.debug("Sending line: " + line);
+        log.log(Level.FINEST, "Sending line: " + line);
         out.print(line);
         out.print(CRLF);
         out.flush();

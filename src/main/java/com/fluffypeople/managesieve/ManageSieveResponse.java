@@ -25,9 +25,8 @@
 package com.fluffypeople.managesieve;
 
 import java.util.Arrays;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Store the response from the Manage Sieve server. <p> Generally this will be
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ManageSieveResponse {
 
-    private static final Logger log = LoggerFactory.getLogger(ManageSieveResponse.class);
+    private static final Logger log = Logger.getLogger(ManageSieveResponse.class.getName());
 
     /**
      * Type of the response.
@@ -79,9 +78,9 @@ public class ManageSieveResponse {
         }
 
         public static Code fromString(final String raw) {
-            log.debug("Constructing code from string: {}", raw);
+            log.log(Level.FINEST, "Constructing code from string: {}", raw);
             String tweaked = raw.replaceAll("-", "_");
-            log.debug("Tweaked version is {}", tweaked);
+            log.log(Level.FINEST, "Tweaked version is {}", tweaked);
             try {
                 return Code.valueOf(tweaked.toUpperCase());
             } catch (IllegalArgumentException ex) {
@@ -180,7 +179,7 @@ public class ManageSieveResponse {
      * @param raw
      */
     void setCode(final String raw) {
-        log.debug("Raw code: {}", raw);
+        log.log(Level.FINEST, "Raw code: {}", raw);
         subCodes = raw.split("/");
         this.code = Code.fromString(subCodes[0]);
     }
