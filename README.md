@@ -7,8 +7,9 @@ provides a Java API to the Manage Sieve protocol.
 
 # Dependencies
 
-This library depends on [Apache Commons Codec][3] for Base64 support. It also depends
-on [SLF4J][4] as its logging facade.
+No runtime dependencies are required.
+
+The Unit tests use testng.
 
 # Example
 
@@ -30,5 +31,3 @@ This library is covered by the MIT licence.
 
 [1]: http://tools.ietf.org/html/rfc3028 "Sieve RFC"
 [2]: http://tools.ietf.org/html/rfc5804 "Manage Sieve RFC"
-[3]: http://commons.apache.org/proper/commons-codec/ "Apache Commons Codec"
-[4]: http://www.slf4j.org/ "Simple Logging Facade for Java"
